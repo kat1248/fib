@@ -26,19 +26,19 @@ char colors[] =
 
 struct fib_count fibs[] = 
 {
-	{1, {0}},                                // 0
-	{2, {BA, BB}},                           // 1 - A | B
-	{2, {BC, BA|BB}},                        // 2 - C | AB
-	{3, {BD, BA|BC, BB|BC}},                 // 3 - D | AC | BC
-	{3, {BA|BD, BB|BD, BA|BB|BC}},           // 4 - AD | BD | ABC
-	{3, {BE, BC|BD, BA|BB|BD}},              // 5 - E | CD | ABD
-	{4, {BA|BE, BB|BE, BA|BC|BD, BB|BC|BD}}, // 6 - AE | BE | ACD | BCD
-	{3, {BA|BB|BE, BC|BE, BA|BB|BC|BD}},     // 7 - ABE | CE | ABCD
-	{3, {BD|BE, BA|BC|BE, BB|BC|BE}},        // 8 - DE | ACE | BCE
-	{3, {BA|BD|BE, BB|BD|BE, BA|BB|BC|BE}},	 // 9 - ADE | BDE | ABCE 
-	{2, {BC|BD|BE, BA|BB|BD|BE}},            // 10 - CDE | ABDE
-	{2, {BA|BC|BD|BE, BB|BC|BD|BE}},         // 11 - ACDE | BCDE
-	{1, {BA|BB|BC|BD|BE}},                   // 12 - ABCDE
+	{ 1, { 0 } },                                // 0
+	{ 2, { BA, BB } },                           // 1 - A | B
+	{ 2, { BC, BA|BB } },                        // 2 - C | AB
+	{ 3, { BD, BA|BC, BB|BC } },                 // 3 - D | AC | BC
+	{ 3, { BA|BD, BB|BD, BA|BB|BC } },           // 4 - AD | BD | ABC
+	{ 3, { BE, BC|BD, BA|BB|BD } },              // 5 - E | CD | ABD
+	{ 4, { BA|BE, BB|BE, BA|BC|BD, BB|BC|BD } }, // 6 - AE | BE | ACD | BCD
+	{ 3, { BA|BB|BE, BC|BE, BA|BB|BC|BD } },     // 7 - ABE | CE | ABCD
+	{ 3, { BD|BE, BA|BC|BE, BB|BC|BE } },        // 8 - DE | ACE | BCE
+	{ 3, { BA|BD|BE, BB|BD|BE, BA|BB|BC|BE } },	 // 9 - ADE | BDE | ABCE 
+	{ 2, { BC|BD|BE, BA|BB|BD|BE } },            // 10 - CDE | ABDE
+	{ 2, { BA|BC|BD|BE, BB|BC|BD|BE } },         // 11 - ACDE | BCDE
+	{ 1, { BA|BB|BC|BD|BE } },                   // 12 - ABCDE
 };
 
 void draw_box( int *b )
@@ -91,7 +91,7 @@ int main( int argc, char *argv[] )
 
 	while( 1 )
 	{
-		time_t t = time( NULL) ;
+		time_t t = time( NULL );
 				
 		struct tm ltm;
 		localtime_r( &t, &ltm );
