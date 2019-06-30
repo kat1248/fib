@@ -72,7 +72,7 @@ void set_led( int *b )
 	}
 }
 
-int pick_fib(int arg)
+int pick_fib( int arg )
 {
 	if( ( arg < 0 ) || ( arg > 12 ) )
 	{
@@ -129,9 +129,9 @@ int main( int argc, char *argv[] )
 			}
 
 			draw_box( timec );
-			// set_led(timec);
+			// set_led( timec );
 		}
-		// set_blink(minute % 5);
+		// set_blink( minute % 5 );
 		old_h = hour;
 		old_m = minute;
 		sleep( 60 );
