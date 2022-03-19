@@ -186,9 +186,12 @@ function start() {
     let ctx = c.getContext("2d");
 
     drawClock(ctx);
-    setInterval(function () { drawClock(ctx) }, 60000);
 
     if (cBlinkMinute) {
         setInterval(function () { blink(ctx) }, 1000);
     }
+
+    let time = new Date();
+    let secondsRemaining = (60 - time.getSeconds()) * 1000;
+    setTimeout(function() { drawClock(ctx); setInterval(function () { drawClock(ctx) }, 60000) }, secondsRemaining);
 }
