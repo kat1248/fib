@@ -69,8 +69,9 @@ const cFibs = [
     fibRecord(1, [BA | BB | BC | BD | BE])						    // 12 - ABCDE
 ];
 
-var gTimec = [];
-var gOldHour, gOldMinute;
+var gTimec = [0, 0, 0, 0, 0];
+var gOldHour = -1;
+var gOldMinute = -1;
 
 function boxRecord(x, y, size) {
     return { x: x * cBaseSize, y: y * cBaseSize, size: size * cBaseSize };
@@ -140,9 +141,6 @@ function drawClock() {
 }
 
 function start() {
-    gOldHour = -1;
-    gOldMinute = -1;
-
     drawClock();
     setInterval(function () { drawClock() }, 60000);
 }
