@@ -25,10 +25,16 @@ White border = +minute (A=0, B=1, C=2, D=3, E=4)
 Example: 1:41 = B/G C/G E/G, B/WB
 */
 
-const cStatic = true;
-const cNumBoxes = 5;
-const cBaseSize = 50;
-const cBorder = 2;
+const cStatic    = false;  // keep the same indication for hour until it changes
+const cBoxMinute = false;  // use a box to indicate sub-minute, otw circle
+const cBlinkMinute = true;
+
+const cNumBoxes  = 5;
+const cBaseSize  = 100;
+const cBorder    = 1;
+
+const cMinuteColor = "PaleGoldenRod";
+const cBorderColor = "#000000";
 
 const BA = 0x01;
 const BB = 0x02;
@@ -36,13 +42,15 @@ const BC = 0x04;
 const BD = 0x08;
 const BE = 0x10;
 
-const cRedValue = 1;
+const cWhiteValue = 0;
+const cRedValue   = 1;
 const cGreenValue = 2;
-const cWhite = "#eeeeee";
+const cBlueValue  = 3;
 
-const cRed = "#ff0000";	   // "#FF6961"
-const cGreen = "#00ff00";  // "#77DD77"
-const cBlue = "#0000ff";   // "#1FCECB"
+const cWhite  = "#eeeeee";
+const cRed    = "#ff0000"; // "#FF6961"
+const cGreen  = "#00ff00"; // "#77DD77"
+const cBlue   = "#0000ff"; // "#1FCECB"
 const cColors = [cWhite, cRed, cGreen, cBlue];
 
 const cBoxes = [
@@ -72,6 +80,9 @@ const cFibs = [
 var gTimec = [0, 0, 0, 0, 0];
 var gOldHour = -1;
 var gOldMinute = -1;
+var gCurrentMinute = 0;
+
+var gDrawMinute = true;
 
 function boxRecord(x, y, size) {
     return { x: x * cBaseSize, y: y * cBaseSize, size: size * cBaseSize };
@@ -81,20 +92,42 @@ function fibRecord(count, vals) {
     return { count: count, values: vals };
 }
 
-function drawBoxes(vals, blink) {
-    let c = document.getElementById("myCanvas");
-    let ctx = c.getContext("2d");
-
+function drawBoxes(ctx) {
     // borders
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = cBorderColor;
     ctx.fillRect(0, 0, 8 * cBaseSize, 5 * cBaseSize);
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(cBoxes[blink].x, cBoxes[blink].y, cBoxes[blink].size, cBoxes[blink].size);
 
     for (let i = 0; i < cNumBoxes; i++) {
-        ctx.fillStyle = cColors[vals[i]];
-        ctx.fillRect(cBoxes[i].x + cBorder, cBoxes[i].y + cBorder, cBoxes[i].size - 2 * cBorder, cBoxes[i].size - 2 * cBorder);
+        let size = cBoxes[i].size - 2 * cBorder;
+        ctx.fillStyle = cColors[gTimec[i]];
+        ctx.fillRect(cBoxes[i].x + cBorder, cBoxes[i].y + cBorder, size, size);
     }
+}
+
+function drawMinute(ctx, m) {
+    // indicate the minute (0-4)
+    ctx.beginPath();
+
+    if (gDrawMinute) {
+        ctx.fillStyle = cMinuteColor;
+    } else {
+        ctx.fillStyle = cColors[gTimec[m]];
+    }
+
+    if (cBoxMinute) {
+        let width = cBoxes[m].size / 3;
+        let size =  cBoxes[m].size - 2 * width;
+        ctx.rect(cBoxes[m].x + width, cBoxes[m].y + width, size, size);
+    } else {
+        let offset = cBoxes[m].size / 2;
+        let radius = cBoxes[m].size / 10;
+        if (!gDrawMinute) {
+            radius += 1;
+        }
+        ctx.arc(cBoxes[m].x + offset, cBoxes[m].y + offset, radius, 0, 2 * Math.PI);
+    }
+
+    ctx.fill();
 }
 
 function pickFib(arg) {
@@ -107,24 +140,24 @@ function pickFib(arg) {
     return f;
 }
 
-function drawClock() {
+function drawClock(ctx) {
     let today = new Date(Date.now());
     let hour = today.getHours();
     if (hour > 12) {
         hour -= 12;
     }
-    let minute = today.getMinutes();
+    gCurrentMinute = today.getMinutes();
 
     let update = true;
-    if (cStatic && (gOldHour == hour) && (Math.floor(minute / 5) == Math.floor(gOldMinute / 5))) {
+    if (cStatic && (gOldHour == hour) && (Math.floor(gCurrentMinute / 5) == Math.floor(gOldMinute / 5))) {
         update = false;
     }
 
     if (update) {
         let hf = pickFib(hour);
-        let mf = pickFib(Math.floor(minute / 5));
+        let mf = pickFib(Math.floor(gCurrentMinute / 5));
         for (let i = 0; i < cNumBoxes; i++) {
-            gTimec[i] = 0;
+            gTimec[i] = cWhiteValue;
             if (hf & (1 << i)) {
                 gTimec[i] = cRedValue;
             }
@@ -135,12 +168,27 @@ function drawClock() {
     }
 
     gOldHour = hour;
-    gOldMinute = minute;
+    gOldMinute = gCurrentMinute;
 
-    drawBoxes(gTimec, minute % 5);
+    drawBoxes(ctx);
+    if (!cBlinkMinute) {
+        drawMinute(ctx, gCurrentMinute % 5);
+    }
+}
+
+function blink(ctx) {
+    drawMinute(ctx, gCurrentMinute % 5);
+    gDrawMinute = !gDrawMinute;
 }
 
 function start() {
-    drawClock();
-    setInterval(function () { drawClock() }, 60000);
+    let c = document.getElementById("myCanvas");
+    let ctx = c.getContext("2d");
+
+    drawClock(ctx);
+    setInterval(function () { drawClock(ctx) }, 60000);
+
+    if (cBlinkMinute) {
+        setInterval(function () { blink(ctx) }, 1000);
+    }
 }
