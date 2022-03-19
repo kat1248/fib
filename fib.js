@@ -36,12 +36,6 @@ const cBorder    = 1;
 const cMinuteColor = "PaleGoldenRod";
 const cBorderColor = "#000000";
 
-const BA = 0x01;
-const BB = 0x02;
-const BC = 0x04;
-const BD = 0x08;
-const BE = 0x10;
-
 const cWhiteValue = 0;
 const cRedValue   = 1;
 const cGreenValue = 2;
@@ -60,6 +54,12 @@ const cBoxes = [
     boxRecord(0, 2, 3),
     boxRecord(3, 0, 5)
 ];
+
+const BA = 0x01;
+const BB = 0x02;
+const BC = 0x04;
+const BD = 0x08;
+const BE = 0x10;
 
 const cFibs = [
     fibRecord(1, [0]),									            // 0
