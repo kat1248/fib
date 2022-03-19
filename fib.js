@@ -48,9 +48,9 @@ const cGreenValue = 2;
 const cBlueValue  = 3;
 
 const cWhite  = "#eeeeee";
-const cRed    = "#ff0000"; // "#FF6961"
-const cGreen  = "#00ff00"; // "#77DD77"
-const cBlue   = "#0000ff"; // "#1FCECB"
+const cRed    = "#FF6961";
+const cGreen  = "#77DD77";
+const cBlue   = "#1FCECB";
 const cColors = [cWhite, cRed, cGreen, cBlue];
 
 const cBoxes = [
