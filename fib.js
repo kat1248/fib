@@ -92,6 +92,16 @@ function fibRecord(count, vals) {
     return { count: count, values: vals };
 }
 
+function pickFib(arg) {
+    if ((arg < 0) || (arg > 12)) {
+        return 0;
+    }
+    let c = cFibs[arg].count;
+    let r = Math.floor(Math.random() * c);
+    let f = cFibs[arg].values[r]
+    return f;
+}
+
 function drawBoxes(ctx) {
     // borders
     ctx.fillStyle = cBorderColor;
@@ -130,18 +140,8 @@ function drawMinute(ctx, m) {
     ctx.fill();
 }
 
-function pickFib(arg) {
-    if ((arg < 0) || (arg > 12)) {
-        return 0;
-    }
-    let c = cFibs[arg].count;
-    let r = Math.floor(Math.random() * c);
-    let f = cFibs[arg].values[r]
-    return f;
-}
-
 function drawClock(ctx) {
-    let today = new Date(Date.now());
+    let today = new Date();
     let hour = today.getHours();
     if (hour > 12) {
         hour -= 12;
@@ -176,7 +176,7 @@ function drawClock(ctx) {
     }
 }
 
-function blink(ctx) {
+function blinkMinute(ctx) {
     drawMinute(ctx, gCurrentMinute % 5);
     gDrawMinute = !gDrawMinute;
 }
@@ -188,7 +188,7 @@ function start() {
     drawClock(ctx);
 
     if (cBlinkMinute) {
-        setInterval(function () { blink(ctx) }, 1000);
+        setInterval(function () { blinkMinute(ctx) }, 1000);
     }
 
     let time = new Date();
