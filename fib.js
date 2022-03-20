@@ -25,26 +25,26 @@ White border = +minute (A=0, B=1, C=2, D=3, E=4)
 Example: 1:41 = B/G C/G E/G, B/WB
 */
 
-const cStatic    = false;  // keep the same indication for hour until it changes
+const cStatic = false;  // keep the same indication for hour until it changes
 const cBoxMinute = false;  // use a box to indicate sub-minute, otw circle
 const cBlinkMinute = true;
 
-const cNumBoxes  = 5;
-const cBaseSize  = 100;
-const cBorder    = 1;
+const cNumBoxes = 5;
+const cBaseSize = 100;
+const cBorder = 1;
 
 const cMinuteColor = "PaleGoldenRod";
 const cBorderColor = "#000000";
 
 const cWhiteValue = 0;
-const cRedValue   = 1;
+const cRedValue = 1;
 const cGreenValue = 2;
-const cBlueValue  = 3;
+const cBlueValue = 3;
 
-const cWhite  = "#eeeeee";
-const cRed    = "#FF6961";
-const cGreen  = "#77DD77";
-const cBlue   = "#1FCECB";
+const cWhite = "#eeeeee";
+const cRed = "#FF6961";
+const cGreen = "#77DD77";
+const cBlue = "#1FCECB";
 const cColors = [cWhite, cRed, cGreen, cBlue];
 
 const cBoxes = [
@@ -126,7 +126,7 @@ function drawMinute(ctx, m) {
 
     if (cBoxMinute) {
         let width = cBoxes[m].size / 3;
-        let size =  cBoxes[m].size - 2 * width;
+        let size = cBoxes[m].size - 2 * width;
         ctx.rect(cBoxes[m].x + width, cBoxes[m].y + width, size, size);
     } else {
         let offset = cBoxes[m].size / 2;
@@ -148,22 +148,15 @@ function drawClock(ctx) {
     }
     gCurrentMinute = today.getMinutes();
 
-    let update = true;
-    if (cStatic && (gOldHour == hour) && (Math.floor(gCurrentMinute / 5) == Math.floor(gOldMinute / 5))) {
-        update = false;
-    }
-
-    if (update) {
-        let hf = pickFib(hour);
-        let mf = pickFib(Math.floor(gCurrentMinute / 5));
-        for (let i = 0; i < cNumBoxes; i++) {
-            gTimec[i] = cWhiteValue;
-            if (hf & (1 << i)) {
-                gTimec[i] = cRedValue;
-            }
-            if (mf & (1 << i)) {
-                gTimec[i] += cGreenValue;
-            }
+    let hf = pickFib(hour);
+    let mf = pickFib(Math.floor(gCurrentMinute / 5));
+    for (let i = 0; i < cNumBoxes; i++) {
+        gTimec[i] = cWhiteValue;
+        if (hf & (1 << i)) {
+            gTimec[i] = cRedValue;
+        }
+        if (mf & (1 << i)) {
+            gTimec[i] += cGreenValue;
         }
     }
 
@@ -193,5 +186,5 @@ function start() {
 
     let time = new Date();
     let secondsRemaining = (60 - time.getSeconds()) * 1000;
-    setTimeout(function() { drawClock(ctx); setInterval(function () { drawClock(ctx) }, 60000) }, secondsRemaining);
+    setTimeout(function () { drawClock(ctx); setInterval(function () { drawClock(ctx) }, 60000) }, secondsRemaining);
 }
