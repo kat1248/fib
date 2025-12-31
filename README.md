@@ -64,7 +64,8 @@ This shows the **meaning of each color** inline:
   <div style="width:40px; height:40px; background:#eeeeee; border:1px solid #000;"></div>
   <span>Unused</span>
 </div>
-'''
+```
+
 
 This visually illustrates what each color represents on the clock.
 
@@ -94,22 +95,23 @@ This visually illustrates what each color represents on the clock.
 
 1. Clone the repository:
 
-'''sh
+```sh
 git clone <repo-url>
 cd <repo-folder>
-'''
+```
+
 
 2. Install dependencies (for testing):
 
-'''sh
+```sh
 npm install
-'''
+```
 
 3. Start a local server to view the clock in a browser (required for ES modules):
 
-'''sh
+```sh
 npx serve .
-'''
+```
 
 ## Running Tests
 
@@ -117,20 +119,22 @@ Tests verify the Fibonacci logic (bitmasks and sums) using Mocha.
 
 1. Ensure dependencies are installed:
 
-'''sh
+```sh
 npm install
-'''
+```
 
 2. Run the tests:
 
-'''sh
+```sh
 npm tests
-'''
+```
 
 3. Expected output:
 
+```
   Fibonacci combinations
     ✓ all combinations sum correctly
     ✓ no mask uses invalid bits
     ✓ zero uses only empty mask
     ✓ twelve uses all boxes
+```
