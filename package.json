@@ -1,0 +1,24 @@
+{
+    "type": "module",
+    "scripts": {
+        "test": "mocha"
+    },
+    "name": "fib",
+    "version": "1.0.0",
+    "description": "Fibonacci clock implementation",
+    "main": "fib.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kat1248/fib.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/kat1248/fib/issues"
+    },
+    "homepage": "https://github.com/kat1248/fib#readme",
+    "devDependencies": {
+        "mocha": "^11.7.5"
+    }
+}

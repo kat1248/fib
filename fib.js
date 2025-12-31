@@ -1,190 +1,217 @@
-/*
-Fibonacci clock implementation
+// fib.js
+// Fibonacci Clock renderer (canvas + time + accessibility)
 
-|-------|---|-----------|
-|       | B |           |
-|   C   |---|           |
-|       | A |           |
-|-------|---|     E     |
-|           |           |
-|     D     |           |
-|           |           |
-|-----------|-----------|
+import { pickFib } from "./fibonacci.js";
 
-A = 1
-B = 1
-C = 2
-D = 3
-E = 5
+(() => {
+    "use strict";
 
-Red = hour
-Green = minute (/5)
-Blue = hour & minute (/5)
-White border = +minute (A=0, B=1, C=2, D=3, E=4)
+    /* -------------------------
+     * Configuration
+     * ------------------------- */
 
-Example: 1:41 = B/G C/G E/G, B/WB
-*/
+    const STATIC_HOUR = true;
+    const BLINK_MINUTE = true;
+    const BOX_MINUTE = false;
 
-const cStatic = false;  // keep the same indication for hour until it changes
-const cBoxMinute = false;  // use a box to indicate sub-minute, otw circle
-const cBlinkMinute = true;
+    const NUM_BOXES = 5;
+    const BASE_SIZE = 100;
+    const BORDER = 1;
 
-const cNumBoxes = 5;
-const cBaseSize = 100;
-const cBorder = 1;
+    const LOGICAL_WIDTH = 8 * BASE_SIZE;
+    const LOGICAL_HEIGHT = 5 * BASE_SIZE;
 
-const cMinuteColor = "PaleGoldenRod";
-const cBorderColor = "#000000";
+    const SECOND_MS = 1000;
+    const MINUTE_MS = 60000;
 
-const cWhiteValue = 0;
-const cRedValue = 1;
-const cGreenValue = 2;
-const cBlueValue = 3;
+    /* -------------------------
+     * Colors
+     * ------------------------- */
 
-const cWhite = "#eeeeee";
-const cRed = "#FF6961";
-const cGreen = "#77DD77";
-const cBlue = "#1FCECB";
-const cColors = [cWhite, cRed, cGreen, cBlue];
+    const WHITE = "#eeeeee";
+    const RED = "#FF6961";
+    const GREEN = "#77DD77";
+    const BLUE = "#1FCECB";
+    const MINUTE_COLOR = "PaleGoldenRod";
+    const BORDER_COLOR = "#000000";
 
-const cBoxes = [
-    boxRecord(2, 1, 1),
-    boxRecord(2, 0, 1),
-    boxRecord(0, 0, 2),
-    boxRecord(0, 2, 3),
-    boxRecord(3, 0, 5)
-];
+    const COLORS = [WHITE, RED, GREEN, BLUE];
 
-const BA = 0x01;
-const BB = 0x02;
-const BC = 0x04;
-const BD = 0x08;
-const BE = 0x10;
+    const WHITE_V = 0;
+    const RED_V = 1;
+    const GREEN_V = 2;
 
-const cFibs = [
-    fibRecord(1, [0]),									            // 0
-    fibRecord(2, [BA, BB]),								            // 1 - A | B
-    fibRecord(2, [BC, BA | BB]),							        // 2 - C | AB
-    fibRecord(3, [BD, BA | BC, BB | BC]),					        // 3 - D | AC | BC
-    fibRecord(3, [BA | BD, BB | BD, BA | BB | BC]), 			    // 4 - AD | BD | ABC
-    fibRecord(3, [BE, BC | BD, BA | BB | BD]),			            // 5 - E | CD | ABD
-    fibRecord(4, [BA | BE, BB | BE, BA | BC | BD, BB | BC | BD]),   // 6 - AE | BE | ACD | BCD
-    fibRecord(3, [BA | BB | BE, BC | BE, BA | BB | BC | BD]),	    // 7 - ABE | CE | ABCD
-    fibRecord(3, [BD | BE, BA | BC | BE, BB | BC | BE]),		    // 8 - DE | ACE | BCE
-    fibRecord(3, [BA | BD | BE, BB | BD | BE, BA | BB | BC | BE]),  // 9 - ADE | BDE | ABCE
-    fibRecord(2, [BC | BD | BE, BA | BB | BD | BE]),			    // 10 - CDE | ABDE
-    fibRecord(2, [BA | BC | BD | BE, BB | BC | BD | BE]),		    // 11 - ACDE | BCDE
-    fibRecord(1, [BA | BB | BC | BD | BE])						    // 12 - ABCDE
-];
+    /* -------------------------
+     * Geometry
+     * ------------------------- */
 
-var gTimec = [0, 0, 0, 0, 0];
-var gOldHour = -1;
-var gOldMinute = -1;
-var gCurrentMinute = 0;
+    const boxes = [
+        box(2, 1, 1),
+        box(2, 0, 1),
+        box(0, 0, 2),
+        box(0, 2, 3),
+        box(3, 0, 5)
+    ];
 
-var gDrawMinute = true;
-
-function boxRecord(x, y, size) {
-    return { x: x * cBaseSize, y: y * cBaseSize, size: size * cBaseSize };
-}
-
-function fibRecord(count, vals) {
-    return { count: count, values: vals };
-}
-
-function pickFib(arg) {
-    if ((arg < 0) || (arg > 12)) {
-        return 0;
-    }
-    let c = cFibs[arg].count;
-    let r = Math.floor(Math.random() * c);
-    let f = cFibs[arg].values[r]
-    return f;
-}
-
-function drawBoxes(ctx) {
-    // borders
-    ctx.fillStyle = cBorderColor;
-    ctx.fillRect(0, 0, 8 * cBaseSize, 5 * cBaseSize);
-
-    for (let i = 0; i < cNumBoxes; i++) {
-        let size = cBoxes[i].size - 2 * cBorder;
-        ctx.fillStyle = cColors[gTimec[i]];
-        ctx.fillRect(cBoxes[i].x + cBorder, cBoxes[i].y + cBorder, size, size);
-    }
-}
-
-function drawMinute(ctx, m) {
-    // indicate the minute (0-4)
-    ctx.beginPath();
-
-    if (gDrawMinute) {
-        ctx.fillStyle = cMinuteColor;
-    } else {
-        ctx.fillStyle = cColors[gTimec[m]];
+    function box(x, y, size) {
+        return {
+            x: x * BASE_SIZE,
+            y: y * BASE_SIZE,
+            size: size * BASE_SIZE
+        };
     }
 
-    if (cBoxMinute) {
-        let width = cBoxes[m].size / 3;
-        let size = cBoxes[m].size - 2 * width;
-        ctx.rect(cBoxes[m].x + width, cBoxes[m].y + width, size, size);
-    } else {
-        let offset = cBoxes[m].size / 2;
-        let radius = cBoxes[m].size / 10;
-        if (!gDrawMinute) {
-            radius += 1;
-        }
-        ctx.arc(cBoxes[m].x + offset, cBoxes[m].y + offset, radius, 0, 2 * Math.PI);
+    /* -------------------------
+     * DOM helpers
+     * ------------------------- */
+
+    const canvas = () => document.getElementById("myCanvas");
+    const textClock = () => document.getElementById("clock-text");
+
+    /* -------------------------
+     * State
+     * ------------------------- */
+
+    let timeColors = new Array(NUM_BOXES).fill(WHITE_V);
+    let currentMinute = 0;
+    let drawMinute = true;
+
+    let lastHour = -1;
+    let lastMinute5 = -1;
+    let hourFib = 0;
+    let minuteFib = 0;
+
+    /* -------------------------
+     * Drawing
+     * ------------------------- */
+
+    function clear(ctx) {
+        ctx.clearRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
     }
 
-    ctx.fill();
-}
+    function drawBoxes(ctx) {
+        ctx.fillStyle = BORDER_COLOR;
+        ctx.fillRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
 
-function drawClock(ctx) {
-    let today = new Date();
-    let hour = today.getHours();
-    if (hour > 12) {
-        hour -= 12;
-    }
-    gCurrentMinute = today.getMinutes();
-
-    let hf = pickFib(hour);
-    let mf = pickFib(Math.floor(gCurrentMinute / 5));
-    for (let i = 0; i < cNumBoxes; i++) {
-        gTimec[i] = cWhiteValue;
-        if (hf & (1 << i)) {
-            gTimec[i] = cRedValue;
-        }
-        if (mf & (1 << i)) {
-            gTimec[i] += cGreenValue;
+        for (let i = 0; i < NUM_BOXES; i++) {
+            const b = boxes[i];
+            const size = b.size - 2 * BORDER;
+            ctx.fillStyle = COLORS[timeColors[i]];
+            ctx.fillRect(b.x + BORDER, b.y + BORDER, size, size);
         }
     }
 
-    gOldHour = hour;
-    gOldMinute = gCurrentMinute;
+    function drawMinuteIndicator(ctx, index) {
+        const b = boxes[index];
+        ctx.beginPath();
 
-    drawBoxes(ctx);
-    if (!cBlinkMinute) {
-        drawMinute(ctx, gCurrentMinute % 5);
+        ctx.fillStyle = drawMinute
+            ? MINUTE_COLOR
+            : COLORS[timeColors[index]];
+
+        if (BOX_MINUTE) {
+            const w = b.size / 3;
+            const s = b.size - 2 * w;
+            ctx.rect(b.x + w, b.y + w, s, s);
+        } else {
+            const r = b.size / 10 + (drawMinute ? 0 : 1);
+            ctx.arc(
+                b.x + b.size / 2,
+                b.y + b.size / 2,
+                r,
+                0,
+                Math.PI * 2
+            );
+        }
+
+        ctx.fill();
     }
-}
 
-function blinkMinute(ctx) {
-    drawMinute(ctx, gCurrentMinute % 5);
-    gDrawMinute = !gDrawMinute;
-}
+    /* -------------------------
+     * Accessibility
+     * ------------------------- */
 
-function start() {
-    let c = document.getElementById("myCanvas");
-    let ctx = c.getContext("2d");
+    function updateAccessibleTime(date) {
+        const el = textClock();
+        if (!el) return;
 
-    drawClock(ctx);
-
-    if (cBlinkMinute) {
-        setInterval(function () { blinkMinute(ctx) }, 1000);
+        const h = date.getHours().toString().padStart(2, "0");
+        const m = date.getMinutes().toString().padStart(2, "0");
+        el.textContent = `The time is ${h}:${m}`;
     }
 
-    let time = new Date();
-    let secondsRemaining = (60 - time.getSeconds()) * 1000;
-    setTimeout(function () { drawClock(ctx); setInterval(function () { drawClock(ctx) }, 60000) }, secondsRemaining);
-}
+    /* -------------------------
+     * Clock logic
+     * ------------------------- */
+
+    function drawClock(ctx) {
+        const now = new Date();
+
+        let hour = now.getHours() % 12;
+        if (hour === 0) hour = 12;
+
+        currentMinute = now.getMinutes();
+        const minute5 = Math.floor(currentMinute / 5);
+
+        if (!STATIC_HOUR || hour !== lastHour) {
+            hourFib = pickFib(hour);
+            lastHour = hour;
+        }
+
+        if (minute5 !== lastMinute5) {
+            minuteFib = pickFib(minute5);
+            lastMinute5 = minute5;
+            drawMinute = true;
+            updateAccessibleTime(now);
+        }
+
+        for (let i = 0; i < NUM_BOXES; i++) {
+            let v = WHITE_V;
+            if (hourFib & (1 << i)) v = RED_V;
+            if (minuteFib & (1 << i)) v += GREEN_V;
+            timeColors[i] = v;
+        }
+
+        clear(ctx);
+        drawBoxes(ctx);
+
+        if (!BLINK_MINUTE) {
+            drawMinuteIndicator(ctx, currentMinute % 5);
+        }
+    }
+
+    function blink(ctx) {
+        drawMinuteIndicator(ctx, currentMinute % 5);
+        drawMinute = !drawMinute;
+    }
+
+    /* -------------------------
+     * Startup
+     * ------------------------- */
+
+    function start() {
+        const c = canvas();
+        if (!c) return;
+
+        c.width = LOGICAL_WIDTH;
+        c.height = LOGICAL_HEIGHT;
+
+        const ctx = c.getContext("2d");
+
+        drawClock(ctx);
+
+        if (BLINK_MINUTE) {
+            setInterval(() => blink(ctx), SECOND_MS);
+        }
+
+        const now = new Date();
+        const delay = (60 - now.getSeconds()) * 1000;
+
+        setTimeout(() => {
+            drawClock(ctx);
+            setInterval(() => drawClock(ctx), MINUTE_MS);
+        }, delay);
+    }
+
+    window.addEventListener("DOMContentLoaded", start);
+})();
