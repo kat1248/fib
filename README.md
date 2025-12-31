@@ -64,6 +64,7 @@ This shows the **meaning of each color** inline:
   <div style="width:40px; height:40px; background:#eeeeee; border:1px solid #000;"></div>
   <span>Unused</span>
 </div>
+'''
 
 This visually illustrates what each color represents on the clock.
 
