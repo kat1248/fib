@@ -24,16 +24,17 @@ A blinking indicator shows the minutes (0–4) inside the corresponding box.
 
 The boxes are arranged visually like this:
 
+```
 +-------+---+-----------+
-| | B | |
-| C |---| |
-| | A | |
-+-------+---+ E |
-| | |
-| D | |
-| | |
+|       | B |           |
+|   C   |---|           |
+|       | A |           |
++-------+---+     E     |
+|           |           |
+|   D       |           |
+|           |           |
 +-----------+-----------+
-
+```
 
 - **A** = 1
 - **B** = 1
@@ -47,7 +48,6 @@ The boxes are arranged visually like this:
 
 This shows the **meaning of each color** inline:
 
-```html
 <div style="display:flex; gap:8px; margin-top:8px;">
   <div style="width:40px; height:40px; background:#FF6961; border:1px solid #000;"></div>
   <span>Hour</span>
@@ -64,7 +64,6 @@ This shows the **meaning of each color** inline:
   <div style="width:40px; height:40px; background:#eeeeee; border:1px solid #000;"></div>
   <span>Unused</span>
 </div>
-```
 
 
 This visually illustrates what each color represents on the clock.
