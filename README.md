@@ -68,56 +68,64 @@ This shows the **meaning of each color** inline:
 
 This visually illustrates what each color represents on the clock.
 
-# Features
+## Features
 
-Pure JavaScript, no frameworks
+- Pure JavaScript, no frameworks
 
-Responsive and accessible (aria-live text updates)
+- Responsive and accessible (aria-live text updates)
 
-Optional blinking minute indicator
+- Optional blinking minute indicator
 
-Explicit color semantics (hour, minute, both)
+- Explicit color semantics (hour, minute, both)
 
-Fully testable Fibonacci logic
+- Fully testable Fibonacci logic
 
-# Files
+## Files
 
-fib.html – main HTML page with canvas
+- fib.html – main HTML page with canvas
 
-fib.js – clock renderer
+- fib.js – clock renderer
 
-fibonacci.js – core Fibonacci logic (pick combinations, bitmasks)
+- fibonacci.js – core Fibonacci logic (pick combinations, bitmasks)
 
-test/fib.test.js – unit tests
+- test/fib.test.js – unit tests
 
-# Running Locally
+## Running Locally
 
 1. Clone the repository:
+
+'''sh
 git clone <repo-url>
 cd <repo-folder>
+'''
 
 2. Install dependencies (for testing):
+
+'''sh
 npm install
+'''
 
 3. Start a local server to view the clock in a browser (required for ES modules):
 
+'''sh
 npx serve .
-# or
-python3 -m http.server
+'''
 
-# Running Tests
+## Running Tests
 
 Tests verify the Fibonacci logic (bitmasks and sums) using Mocha.
 
 1. Ensure dependencies are installed:
 
+'''sh
 npm install
-
+'''
 
 2. Run the tests:
 
-npm test
-
+'''sh
+npm tests
+'''
 
 3. Expected output:
 
