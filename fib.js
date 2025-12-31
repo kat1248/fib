@@ -1,5 +1,5 @@
 // fib.js
-// Fibonacci Clock renderer (canvas + time + accessibility)
+// Fibonacci Clock renderer (hour, minute, both) with accessibility
 
 import { pickFib } from "./fibonacci.js";
 
@@ -28,18 +28,19 @@ import { pickFib } from "./fibonacci.js";
      * Colors
      * ------------------------- */
 
-    const WHITE = "#eeeeee";
-    const RED = "#FF6961";
-    const GREEN = "#77DD77";
-    const BLUE = "#1FCECB";
+    const WHITE = "#eeeeee"; // neither
+    const RED = "#FF6961";   // hour
+    const GREEN = "#77DD77"; // minute
+    const BLUE = "#1AA3A3";  // hour + minute
     const MINUTE_COLOR = "PaleGoldenRod";
     const BORDER_COLOR = "#000000";
 
     const COLORS = [WHITE, RED, GREEN, BLUE];
 
-    const WHITE_V = 0;
-    const RED_V = 1;
-    const GREEN_V = 2;
+    const COLOR_NONE = 0;
+    const COLOR_HOUR = 1;
+    const COLOR_MINUTE = 2;
+    const COLOR_BOTH = 3;
 
     /* -------------------------
      * Geometry
@@ -54,11 +55,7 @@ import { pickFib } from "./fibonacci.js";
     ];
 
     function box(x, y, size) {
-        return {
-            x: x * BASE_SIZE,
-            y: y * BASE_SIZE,
-            size: size * BASE_SIZE
-        };
+        return { x: x * BASE_SIZE, y: y * BASE_SIZE, size: size * BASE_SIZE };
     }
 
     /* -------------------------
@@ -72,7 +69,7 @@ import { pickFib } from "./fibonacci.js";
      * State
      * ------------------------- */
 
-    let timeColors = new Array(NUM_BOXES).fill(WHITE_V);
+    let timeColors = new Array(NUM_BOXES).fill(COLOR_NONE);
     let currentMinute = 0;
     let drawMinute = true;
 
@@ -82,7 +79,7 @@ import { pickFib } from "./fibonacci.js";
     let minuteFib = 0;
 
     /* -------------------------
-     * Drawing
+     * Drawing helpers
      * ------------------------- */
 
     function clear(ctx) {
@@ -105,9 +102,7 @@ import { pickFib } from "./fibonacci.js";
         const b = boxes[index];
         ctx.beginPath();
 
-        ctx.fillStyle = drawMinute
-            ? MINUTE_COLOR
-            : COLORS[timeColors[index]];
+        ctx.fillStyle = drawMinute ? MINUTE_COLOR : COLORS[timeColors[index]];
 
         if (BOX_MINUTE) {
             const w = b.size / 3;
@@ -115,13 +110,7 @@ import { pickFib } from "./fibonacci.js";
             ctx.rect(b.x + w, b.y + w, s, s);
         } else {
             const r = b.size / 10 + (drawMinute ? 0 : 1);
-            ctx.arc(
-                b.x + b.size / 2,
-                b.y + b.size / 2,
-                r,
-                0,
-                Math.PI * 2
-            );
+            ctx.arc(b.x + b.size / 2, b.y + b.size / 2, r, 0, Math.PI * 2);
         }
 
         ctx.fill();
@@ -166,18 +155,19 @@ import { pickFib } from "./fibonacci.js";
         }
 
         for (let i = 0; i < NUM_BOXES; i++) {
-            let v = WHITE_V;
-            if (hourFib & (1 << i)) v = RED_V;
-            if (minuteFib & (1 << i)) v += GREEN_V;
-            timeColors[i] = v;
+            const hasHour = (hourFib & (1 << i)) !== 0;
+            const hasMinute = (minuteFib & (1 << i)) !== 0;
+
+            if (hasHour && hasMinute) timeColors[i] = COLOR_BOTH;
+            else if (hasHour) timeColors[i] = COLOR_HOUR;
+            else if (hasMinute) timeColors[i] = COLOR_MINUTE;
+            else timeColors[i] = COLOR_NONE;
         }
 
         clear(ctx);
         drawBoxes(ctx);
 
-        if (!BLINK_MINUTE) {
-            drawMinuteIndicator(ctx, currentMinute % 5);
-        }
+        if (!BLINK_MINUTE) drawMinuteIndicator(ctx, currentMinute % 5);
     }
 
     function blink(ctx) {
@@ -200,9 +190,7 @@ import { pickFib } from "./fibonacci.js";
 
         drawClock(ctx);
 
-        if (BLINK_MINUTE) {
-            setInterval(() => blink(ctx), SECOND_MS);
-        }
+        if (BLINK_MINUTE) setInterval(() => blink(ctx), SECOND_MS);
 
         const now = new Date();
         const delay = (60 - now.getSeconds()) * 1000;
