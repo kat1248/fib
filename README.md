@@ -31,7 +31,7 @@ The boxes are arranged visually like this:
 |       | A |           |
 +-------+---+     E     |
 |           |           |
-|   D       |           |
+|     D     |           |
 |           |           |
 +-----------+-----------+
 ```
