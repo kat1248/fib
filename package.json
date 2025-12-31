@@ -1,0 +1,31 @@
+{
+    "type": "module",
+    "scripts": {
+        "test": "mocha",
+        "format": "prettier --write '*.js'",
+        "check": "npm run lint && npx prettier --check '*.js'",
+        "lint": "eslint '*.js' --max-warnings=0"
+    },
+    "name": "fib",
+    "version": "1.0.0",
+    "description": "Fibonacci clock implementation",
+    "main": "fib.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kat1248/fib.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/kat1248/fib/issues"
+    },
+    "homepage": "https://github.com/kat1248/fib#readme",
+    "devDependencies": {
+        "mocha": "^11.7.5",
+        "eslint": "^9.39.2",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-security": "^3.0.1",
+        "prettier": "^3.7.4"
+    }
+}
