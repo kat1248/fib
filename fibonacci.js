@@ -29,7 +29,9 @@ export const FIBS = [
 ];
 
 /**
- * Pick a random Fibonacci bitmask for value n (0–12)
+ * Selects a random bitmask whose corresponding VALUES sum equals the given n (0–12).
+ * @param {number} n - Target sum between 0 and 12 inclusive.
+ * @returns {number} A bitmask (combination of A–E) whose VALUES sum to `n`, or `0` if `n` is outside 0–12.
  */
 export function pickFib(n) {
   if (n < 0 || n > 12) return 0;
@@ -38,8 +40,13 @@ export function pickFib(n) {
 }
 
 /**
- * Sum a bitmask using Fibonacci VALUES
- * (useful for tests & validation)
+ * Compute the sum of Fibonacci VALUES represented by a bitmask.
+ *
+ * Each set bit in `mask` selects the corresponding entry in `VALUES`
+ * (bit 0 -> VALUES[0], bit 1 -> VALUES[1], etc.). Typical masks use
+ * the exported A/B/C/D/E bit flags.
+ * @param {number} mask - Bitmask where each bit selects a value from `VALUES`.
+ * @returns {number} The sum of the selected entries from `VALUES`.
  */
 export function sumMask(mask) {
   let sum = 0;

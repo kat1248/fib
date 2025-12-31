@@ -54,6 +54,13 @@ import { pickFib } from "./fibonacci.js";
     box(3, 0, 5),
   ];
 
+  /**
+   * Create a box descriptor with absolute coordinates and size scaled by BASE_SIZE.
+   * @param {number} x - Horizontal grid coordinate (in base-size units).
+   * @param {number} y - Vertical grid coordinate (in base-size units).
+   * @param {number} size - Size of the box (in base-size units).
+   * @returns {{x: number, y: number, size: number}} An object with `x`, `y`, and `size` expressed in absolute (scaled) units.
+   */
   function box(x, y, size) {
     return { x: x * BASE_SIZE, y: y * BASE_SIZE, size: size * BASE_SIZE };
   }
@@ -78,14 +85,22 @@ import { pickFib } from "./fibonacci.js";
   let hourFib = 0;
   let minuteFib = 0;
 
-  /* -------------------------
-   * Drawing helpers
-   * ------------------------- */
+  /**
+   * Clears the entire logical canvas area used by the clock.
+   * @param {CanvasRenderingContext2D} ctx - 2D rendering context for the target canvas.
+   */
 
   function clear(ctx) {
     ctx.clearRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
   }
 
+  /**
+   * Renders the clock background and fills each display box according to the current color states.
+   *
+   * Uses BORDER_COLOR to draw the outer background, then fills each box from the global `boxes`
+   * layout using the corresponding entry in `timeColors` mapped through `COLORS`.
+   * @param {CanvasRenderingContext2D} ctx - 2D drawing context of the target canvas.
+   */
   function drawBoxes(ctx) {
     ctx.fillStyle = BORDER_COLOR;
     ctx.fillRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
@@ -98,6 +113,17 @@ import { pickFib } from "./fibonacci.js";
     }
   }
 
+  /**
+   * Draws the minute indicator inside a specified box using the configured style.
+   *
+   * When the minute marker is active, the indicator is drawn using the minute color;
+   * otherwise it is drawn using the box's current color. The indicator is rendered
+   * as a smaller inset square when box-style minute indicators are enabled, or as
+   * a small circle when they are not.
+   *
+   * @param {CanvasRenderingContext2D} ctx - 2D drawing context for the canvas.
+   * @param {number} index - Zero-based index of the box in which to draw the indicator.
+   */
   function drawMinuteIndicator(ctx, index) {
     const b = boxes[index];
     ctx.beginPath();
@@ -116,9 +142,13 @@ import { pickFib } from "./fibonacci.js";
     ctx.fill();
   }
 
-  /* -------------------------
-   * Accessibility
-   * ------------------------- */
+  /**
+   * Update the clock-text element with the provided time for assistive technologies.
+   *
+   * Sets the element returned by textClock() to the string "The time is HH:MM" (24-hour, zero-padded).
+   * No action is taken if the target element is not present.
+   * @param {Date} date - Date whose hours and minutes are used to produce the HH:MM string.
+   */
 
   function updateAccessibleTime(date) {
     const el = textClock();
@@ -129,9 +159,13 @@ import { pickFib } from "./fibonacci.js";
     el.textContent = `The time is ${h}:${m}`;
   }
 
-  /* -------------------------
-   * Clock logic
-   * ------------------------- */
+  /**
+   * Update the clock state for the current time and render the display.
+   *
+   * Updates hour and 5-minute Fibonacci masks (respecting STATIC_HOUR), updates the per-box color state array, sets the minute-indicator visibility flag when the 5-minute bucket changes, updates the accessible time text, clears and redraws the canvas, and — if BLINK_MINUTE is disabled — renders the minute indicator for the current 5-minute bucket immediately.
+   *
+   * @param {CanvasRenderingContext2D} ctx - 2D rendering context for the clock canvas.
+   */
 
   function drawClock(ctx) {
     const now = new Date();
@@ -170,14 +204,20 @@ import { pickFib } from "./fibonacci.js";
     if (!BLINK_MINUTE) drawMinuteIndicator(ctx, currentMinute % 5);
   }
 
+  /**
+   * Draws the minute indicator for the current 5-minute bucket and toggles its visibility state.
+   * @param {CanvasRenderingContext2D} ctx - Canvas 2D rendering context used for drawing.
+   */
   function blink(ctx) {
     drawMinuteIndicator(ctx, currentMinute % 5);
     drawMinute = !drawMinute;
   }
 
-  /* -------------------------
-   * Startup
-   * ------------------------- */
+  /**
+   * Initialize the canvas renderer: size the canvas, perform the initial draw, start the optional per-second blink timer, and schedule minute-aligned redraws.
+   *
+   * Performs no action if the canvas element cannot be found.
+   */
 
   function start() {
     const c = canvas();
